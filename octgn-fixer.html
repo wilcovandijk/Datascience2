@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en" data-framework="typescript">
+	<head>
+		<meta charset="utf-8">
+		<title>AGOT OCTGN Fixer</title>
+		<link href='https://fonts.googleapis.com/css?family=Cinzel' rel='stylesheet' type='text/css'>
+		<link href="/css/setup-analyzer.css" media="all" rel="stylesheet">
+		<link href="/css/hint.css" media="all" rel="stylesheet">
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+	</head>
+	<body>
+    <h2>Select octgn file with No Middle Ground cards:</h2>
+    <input type="file" id="file-input" />
+	</body>
+  <script>
+  function readSingleFile(e) {
+    var file = e.target.files[0];
+    if (!file) {
+      return;
+    }
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      var filename = "";
+      var fullPath = document.getElementById('file-input').value;
+      if (fullPath) {
+      	var startIndex = (fullPath.indexOf('\\') >= 0 ? fullPath.lastIndexOf('\\') : fullPath.lastIndexOf('/'));
+      	filename = fullPath.substring(startIndex);
+      	if (filename.indexOf('\\') === 0 || filename.indexOf('/') === 0) {
+      		filename = filename.substring(1);
+      	}
+        filename = filename.substring(0, filename.lastIndexOf('.'));
+      }
+
+      var contents = e.target.result;
+      download(filename+"-fixed.o8d", fixFile(contents));
+    };
+    reader.readAsText(file);
+  }
+
+  function fixFile(content){
+    var cards = {
+      '93552737-ce98-4bf7-97df-3dc3ac91bbf9': 'Wraiths in Their Midst',
+			"3d6b03c9-34d4-4baf-9403-67930d71ca2d": 'The First Snow of Winter',
+			"09ff3aa5-b660-4085-9dc8-f79f46ff1f28": "Wildling Scout",
+			"820eaee8-862e-4e4e-8bde-c30432c6995d": "Condemned",
+			"578da716-55b2-4306-8f8f-c96f21db7136": "Maester of Starfall",
+			"19d4d3d0-19a4-436b-8f70-aaa28060dffe": "Blood of the Dragon",
+			"b785b7fc-2a11-4ba5-87e7-7c06c79d6210": "Dothraki Outriders",
+			"b4556df9-14cd-41cd-9ec9-4e077e4c1ca5": "Loot",
+			"91b7190f-d0ba-4c3b-b9e2-5e7d2c872acb": "Priest of the Drowned God",
+			"8b2811a3-3058-48ee-a62d-c4ed6d571c2c": "Paid Off",
+			"170f6c43-1cf5-460a-bd32-996d26dc0cd9": "Red Cloaks",
+			"f1ad4682-6d5b-43b7-9b18-0b6c3900081e": "Tobho Mott&#039;s Armory",
+			"b1384b69-2885-4f64-9417-ce24be0dce80": "Gendry",
+			"fc066770-d985-45dd-bfd3-354add73c516": "For the Watch!",
+			"3284b689-5354-4148-bcb4-9be6f05c2e67": "The Watcher on the Walls",
+			"ba89a709-fe0b-4c19-bc2e-5a55c1ef4659": "Halder",
+			"c3ba26a2-a3d7-47fc-b3c8-4a01b9f456e5": "The Arbor",
+			"9041e5bf-fcb6-4f94-b8ca-85c5a932d171": "Ser Horas Redwyne",
+			"d6db24e4-410d-42dc-8175-05eae8de54ec": "Wardens of the North",
+			"c8c63b0d-d3ea-4529-8022-1447655e740f": "Hodor"
+    };
+
+    var results = content;
+    for (var id in cards) {
+      var re = new RegExp('id="">'+cards[id], 'gi');
+      results = results.replace(re, 'id="' + id + '">'+cards[id]);
+    }
+    return results;
+  }
+
+  function displayContents(contents) {
+    var element = document.getElementById('file-content');
+    element.innerHTML = contents;
+  }
+
+  function download(filename, text) {
+      var pom = document.createElement('a');
+      pom.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+      pom.setAttribute('download', filename);
+
+      if (document.createEvent) {
+          var event = document.createEvent('MouseEvents');
+          event.initEvent('click', true, true);
+          pom.dispatchEvent(event);
+      }
+      else {
+          pom.click();
+      }
+  }
+
+  document.getElementById('file-input')
+    .addEventListener('change', readSingleFile, false);
+  </script>
+</html>
